@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🤖 TARS
+# 🤖 openTARS
 
 ### Um assistente de IA que roda 100% no seu PC — sem nuvem, sem mensalidade, sem enviar nada pra fora.
 
@@ -17,7 +17,7 @@
 
 ## O que é
 
-TARS é um assistente de IA para desktop Linux que entende comandos em
+openTARS é um assistente de IA para desktop Linux que entende comandos em
 **português** e controla o seu computador de verdade: abre e fecha
 programas, navega e pesquisa na web, digita, clica, move o mouse,
 analisa o que está na tela e executa comandos de terminal — tudo isso
@@ -34,7 +34,7 @@ Você › veja minha tela e me diz o que tem de errado nesse código
 Você › feche todas as abas do navegador
 ```
 
-## Por que TARS existe
+## Por que openTARS existe
 
 A maioria dos assistentes de IA hoje depende de mandar seus dados pra
 um servidor de alguma empresa. TARS nasceu da ideia oposta: **e se o
