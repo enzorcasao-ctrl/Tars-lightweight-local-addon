@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/logo.svg" width="96" alt="Logo do openTARS">
+<img src="logo.svg" width="96" alt="Logo do openTARS">
 
 # openTARS
 
@@ -19,7 +19,7 @@ Tudo na sua máquina, via Ollama: sem nuvem, sem conta, sem mensalidade.
 
 <br>
 
-<img src="docs/janela.png" width="820" alt="Janela do openTARS: o pedido, a IA escolhida, as ferramentas usadas e a resposta">
+<img src="janela.png" width="820" alt="Janela do openTARS: o pedido, a IA escolhida, as ferramentas usadas e a resposta">
 
 </div>
 
@@ -112,7 +112,7 @@ flowchart LR
 
 Abra o **openTARS** no menu de aplicativos, ou rode `opentars-gui`. Prefere o terminal? Use `opentars`.
 
-<img src="docs/boas-vindas.png" width="620" alt="Tela inicial com exemplos de pedidos">
+<img src="boas-vindas.png" width="620" alt="Tela inicial com exemplos de pedidos">
 
 Exemplos:
 
@@ -235,7 +235,7 @@ tars.py            núcleo: escolha de modelo, ajudante, ferramentas de desktop 
 tars_gui.py        interface gráfica (Tkinter), usa o tars.py por baixo
 tests/             testes automatizados (os de janela rodam de verdade num Xvfb + openbox, se houver)
 empacotamento/     tudo que vira o .deb (setup.sh, lançadores, atalhos, ícone, scripts do Debian)
-docs/              imagens deste README
+logo.svg, janela.png, boas-vindas.png   imagens deste README
 ```
 
 ```bash
