@@ -7,10 +7,11 @@ Assistente de IA 100% local para desktop Linux. Roda inteiramente na sua máquin
 Você escreve em português, o openTARS executa:
 
 - **Controla o desktop**: abre e fecha aplicativos, clica, digita, move o mouse
+- **Enxerga as janelas**: sabe o que está aberto, traz a janela certa pra frente e olha só pra ela antes de clicar
 - **Pesquisa na web**: "pesquise rtx 5060 no google" abre a busca certa
 - **Analisa a tela**: tira um print e descreve o que está vendo
 - **Roda comandos**: executa no terminal e mostra o resultado
-- **Escolhe o modelo sozinho**: usa, entre os modelos que você já tem no Ollama, o mais adequado para cada tarefa
+- **Escolhe o modelo sozinho**: usa, entre os modelos que você já tem no Ollama, o mais adequado para cada tarefa, sem perder o fio da conversa quando troca de modelo
 
 Nada do que você digita ou mostra sai do seu PC.
 
@@ -73,10 +74,15 @@ Exemplos:
 
 ```
 abra o firefox
+abra a calculadora e clique em 7, +, 2 e =
 pesquise rtx 5060 no google
 o que tem na minha tela?
 quanto espaço livre tenho no disco?
 ```
+
+Para interromper uma resposta ou tarefa: botão **Parar** (ou `Esc`) na janela, `Ctrl+C` no terminal. Na janela, as setas ↑/↓ repetem pedidos anteriores.
+
+A conversa fica salva e continua de onde parou ao reabrir (na janela ou no terminal). `/limpar` ou **Limpar conversa** começa do zero.
 
 No terminal, `/modelo` lista os modelos instalados, `/modelo <nome>` fixa um modelo e `/modelo auto` volta para a escolha automática. Na interface gráfica, isso fica no seletor no topo da janela.
 
@@ -85,6 +91,7 @@ No terminal, `/modelo` lista os modelos instalados, `/modelo <nome>` fixa um mod
 - **`E: Unsupported file ... given on commandline`**: o arquivo não está na pasta atual. Entre na pasta onde ele foi baixado (`cd ~/Downloads`) ou use o comando com `wget` acima.
 - **Cliques e digitação não fazem nada**: você provavelmente está numa sessão Wayland. Na tela de login, clique na engrenagem e escolha a opção que tem "Xorg" no nome (no Ubuntu, "Ubuntu on Xorg").
 - **"O Ollama não está respondendo"**: inicie o serviço com `sudo systemctl start ollama`. Se ele roda em Docker ou em outra máquina, defina `OLLAMA_HOST` (ex: `export OLLAMA_HOST=192.168.0.10:11434`).
+- **A IA esquece o pedido no meio da tarefa ou a resposta é cortada**: falta contexto. O openTARS usa 16 mil tokens com GPU de 16 GB ou mais e 8 mil nos outros casos. Para mudar: `TARS_CONTEXTO=32768 opentars-gui`. Mais contexto usa mais VRAM.
 - **Ollama não instalou** (sem internet na hora): instale em [ollama.com/download](https://ollama.com/download) e rode `opentars --setup`.
 - **Interface gráfica não abre**: `sudo apt install python3-tk` e depois `opentars --setup`.
 - **"Nenhum modelo encontrado"**: baixe um modelo de conversa com `ollama pull qwen3:8b`.
@@ -102,7 +109,7 @@ O Ollama, os modelos baixados e o seu histórico (`~/.tars_sessoes.json`, `~/.ta
 ```
 tars.py            núcleo: escolha de modelo, ferramentas de desktop, modo terminal
 tars_gui.py        interface gráfica (Tkinter), usa o tars.py por baixo
-tests/             testes automatizados
+tests/             testes automatizados (os de janela rodam de verdade num Xvfb + openbox, se houver)
 empacotamento/     tudo que vira o .deb (setup.sh, lançadores, atalhos, ícone, scripts do Debian)
 ```
 
@@ -125,7 +132,7 @@ Gerar o `.deb` (sai em `dist/`):
 bash empacotamento/build.sh
 ```
 
-A versão fica na variável `VERSAO` do `build.sh` e no topo de `empacotamento/doc/changelog`.
+A versão fica na constante `VERSAO` do `tars.py` (o `build.sh` lê de lá) e no topo de `empacotamento/doc/changelog`.
 
 ## Licença
 
