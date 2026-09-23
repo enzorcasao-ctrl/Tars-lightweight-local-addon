@@ -34,7 +34,7 @@ sudo apt install ./opentars_all.deb
 
 O instalador cuida do resto e pula o que você já tiver:
 
-- instala o Ollama
+- instala o Ollama (se já houver um rodando, inclusive em Docker, usa esse)
 - cria um ambiente Python isolado com as dependências
 - baixa o modelo ajudante `gemma3:270m` (~300 MB)
 - adiciona o openTARS ao menu de aplicativos
@@ -46,6 +46,18 @@ ollama pull qwen3:8b
 ```
 
 Quem já tinha a versão 1.0.0 (pacote `tars`) pode instalar por cima: ela é substituída automaticamente e o histórico de conversas é mantido.
+
+## Compatibilidade
+
+| | Funciona | Observação |
+|---|---|---|
+| **Distros** | Ubuntu 22.04+, Debian 12+, Mint, Zorin, Pop!_OS e derivados | precisa do `apt` |
+| **Desktop** | GNOME, KDE, Cinnamon, XFCE, MATE e outros | abre apps do menu, Snap e Flatpak, pelo nome em português ou inglês |
+| **Sessão Xorg (X11)** | tudo | |
+| **Sessão Wayland** | conversa, abrir apps/sites, comandos, prints | cliques e digitação simulados só chegam a alguns apps (limitação do Wayland) |
+| **GPU** | NVIDIA, AMD ou só CPU | sem GPU, o modo automático evita modelos grandes demais pra CPU |
+| **Ollama** | local, Docker ou em outra máquina | outro endereço: variável `OLLAMA_HOST`, igual à do Ollama |
+| **Modelos** | qualquer um do Ollama | modelos sem suporte a ferramentas só conversam; os de embedding ficam de fora |
 
 ## Uso
 
@@ -71,7 +83,8 @@ No terminal, `/modelo` lista os modelos instalados, `/modelo <nome>` fixa um mod
 ## Problemas comuns
 
 - **`E: Unsupported file ... given on commandline`**: o arquivo não está na pasta atual. Entre na pasta onde ele foi baixado (`cd ~/Downloads`) ou use o comando com `wget` acima.
-
+- **Cliques e digitação não fazem nada**: você provavelmente está numa sessão Wayland. Na tela de login, clique na engrenagem e escolha a opção que tem "Xorg" no nome (no Ubuntu, "Ubuntu on Xorg").
+- **"O Ollama não está respondendo"**: inicie o serviço com `sudo systemctl start ollama`. Se ele roda em Docker ou em outra máquina, defina `OLLAMA_HOST` (ex: `export OLLAMA_HOST=192.168.0.10:11434`).
 - **Ollama não instalou** (sem internet na hora): instale em [ollama.com/download](https://ollama.com/download) e rode `opentars --setup`.
 - **Interface gráfica não abre**: `sudo apt install python3-tk` e depois `opentars --setup`.
 - **"Nenhum modelo encontrado"**: baixe um modelo de conversa com `ollama pull qwen3:8b`.
