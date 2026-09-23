@@ -1,5 +1,7 @@
 # openTARS
 
+[![Licença: MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-green.svg)](LICENSE)
+
 Assistente de IA 100% local para desktop Linux. Você pede em português e ele faz: abre programas, clica, digita, pesquisa, olha a tela e roda comandos. Tudo roda na sua máquina via [Ollama](https://ollama.com): sem nuvem, sem conta, sem mensalidade.
 
 **Versão atual: 2.0**
@@ -176,4 +178,4 @@ A versão fica na constante `VERSAO` do `tars.py` (o `build.sh` lê de lá) e no
 
 ## Licença
 
-A definir.
+[MIT](LICENSE): você pode usar, copiar, modificar e distribuir o openTARS, inclusive em outros projetos, desde que mantenha o aviso de copyright e a licença junto. O software é fornecido "como está", sem garantia.
