@@ -133,6 +133,7 @@ Exemplo: `TARS_CONTEXTO=32768 opentars-gui`
 - **"Ajudante qwen2.5:0.5b não instalado"**: a instalação ficou sem internet na hora. Rode `ollama pull qwen2.5:0.5b`.
 - **Cliques e digitação não fazem nada**: provavelmente a sessão é Wayland. Na tela de login, clique na engrenagem e escolha a opção com "Xorg" no nome (no Ubuntu, "Ubuntu on Xorg").
 - **"O Ollama não está respondendo"**: inicie o serviço com `sudo systemctl start ollama`. Se ele roda em Docker ou em outra máquina, defina `OLLAMA_HOST` (ex: `export OLLAMA_HOST=192.168.0.10:11434`).
+- **A IA diz que "não consegue" abrir ou fechar um programa**: o openTARS já lembra ela das ferramentas automaticamente. Se continuar, use um modelo de conversa geral (ex: `qwen3:8b`); modelos só de programação, como o `qwen2.5-coder`, são ruins pra controlar o desktop e o modo automático já evita eles nessas tarefas.
 - **A IA escolhe um modelo estranho pro pedido**: rode `opentars --avaliar-classificador` pra ver quanto o ajudante acerta no seu PC, ou fixe um modelo no seletor da janela.
 - **A IA esquece o pedido no meio da tarefa ou a resposta é cortada**: falta memória de contexto. Aumente com `TARS_CONTEXTO` (usa mais VRAM).
 - **Ollama não instalou** (sem internet na hora): instale em [ollama.com/download](https://ollama.com/download) e rode `opentars --setup`.
