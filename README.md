@@ -21,12 +21,12 @@ Para Ubuntu, Debian, Linux Mint, Zorin OS, Pop!_OS e derivados.
 Cole no terminal:
 
 ```bash
-wget -O /tmp/opentars.deb https://github.com/enzorcasao-ctrl/Tars-lightweight-local-addon/releases/latest/download/opentars_all.deb && sudo apt install -y /tmp/opentars.deb
+wget -O /tmp/opentars.deb https://github.com/enzorcasao-ctrl/openTars-lightweight-local-addon/raw/main/opentars_all.deb && sudo apt install -y /tmp/opentars.deb
 ```
 
 O comando baixa sempre a versão mais nova e instala. O mesmo comando serve para **atualizar**.
 
-Prefere baixar manualmente? Pegue o `.deb` em [Releases](https://github.com/enzorcasao-ctrl/Tars-lightweight-local-addon/releases/latest) e, na pasta onde ele foi salvo (normalmente `~/Downloads`):
+Prefere baixar manualmente? Clique em [`opentars_all.deb`](https://github.com/enzorcasao-ctrl/openTars-lightweight-local-addon/raw/main/opentars_all.deb) para baixar e, na pasta onde ele foi salvo (normalmente `~/Downloads`):
 
 ```bash
 sudo apt install ./opentars_all.deb
@@ -83,6 +83,36 @@ sudo apt remove opentars
 ```
 
 O Ollama, os modelos baixados e o seu histórico (`~/.tars_sessoes.json`, `~/.tars_log/`) são mantidos.
+
+## Para desenvolvedores
+
+```
+tars.py            núcleo: escolha de modelo, ferramentas de desktop, modo terminal
+tars_gui.py        interface gráfica (Tkinter), usa o tars.py por baixo
+tests/             testes automatizados
+empacotamento/     tudo que vira o .deb (setup.sh, lançadores, atalhos, ícone, scripts do Debian)
+```
+
+Rodar direto do código (precisa de `requests`, `psutil`, `pyautogui`, `pillow` e `python3-tk`):
+
+```bash
+python3 tars.py        # terminal
+python3 tars_gui.py    # interface gráfica
+```
+
+Rodar os testes:
+
+```bash
+python3 tests/run_all.py
+```
+
+Gerar o `.deb` (sai em `dist/`):
+
+```bash
+bash empacotamento/build.sh
+```
+
+A versão fica na variável `VERSAO` do `build.sh` e no topo de `empacotamento/doc/changelog`.
 
 ## Licença
 
