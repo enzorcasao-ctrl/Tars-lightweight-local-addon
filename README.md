@@ -9,7 +9,7 @@
 Você pede do seu jeito. Ele abre programas, clica nos botões pelo nome, digita, pesquisa, olha a tela e roda comandos.<br>
 Tudo na sua máquina, via Ollama: sem nuvem, sem conta, sem mensalidade.
 
-[![Versão 2.5.1](https://img.shields.io/badge/vers%C3%A3o-2.5.1-5FD97A?style=flat-square)](#instalação)
+[![Versão 2.5.2](https://img.shields.io/badge/vers%C3%A3o-2.5.2-5FD97A?style=flat-square)](#instalação)
 [![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-5FD97A?style=flat-square)](LICENSE)
 [![Linux](https://img.shields.io/badge/Linux-Ubuntu%20%C2%B7%20Mint%20%C2%B7%20Zorin%20%C2%B7%20Debian-1A2446?style=flat-square&logo=linux&logoColor=white)](#compatibilidade)
 [![Ollama](https://img.shields.io/badge/roda%20com-Ollama-1A2446?style=flat-square)](https://ollama.com)
@@ -236,6 +236,12 @@ O openTARS lembra ela das ferramentas e, se ela recusar de novo, passa o pedido 
 <summary><b>O clique pelo nome não acha os botões de um app</b></summary>
 
 Rode `opentars --diagnostico` e veja a linha "Clique pelo nome". Apps Qt/KDE passam a aparecer depois da primeira vez que o openTARS usa a acessibilidade (reabra o app). Jogos e alguns apps Electron não expõem os botões: nesses, a IA usa o print e clica pela posição (melhor com um modelo com visão).
+</details>
+
+<details>
+<summary><b>"Multimodal data provided, but model does not support multimodal requests"</b></summary>
+
+Resolvido na 2.5.2. Quando o modelo da conversa não enxerga imagens (qwen3, llama…), o print não é mais mandado pra ele: um modelo com visão instalado (`gemma3`, `qwen2.5vl`, `llava`…) descreve a tela em texto. Se você não tiver nenhum, a IA lê os botões pela acessibilidade (`list_elements`). Pra ter a descrição, rode `ollama pull gemma3:4b`.
 </details>
 
 <details>
