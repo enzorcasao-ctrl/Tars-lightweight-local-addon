@@ -9,7 +9,7 @@
 Você pede do seu jeito. Ele abre programas, clica nos botões pelo nome, digita, pesquisa, olha a tela e roda comandos.<br>
 Tudo na sua máquina, via Ollama: sem nuvem, sem conta, sem mensalidade.
 
-[![Versão 2.5.2](https://img.shields.io/badge/vers%C3%A3o-2.5.2-5FD97A?style=flat-square)](#instalação)
+[![Versão 2.6.0](https://img.shields.io/badge/vers%C3%A3o-2.6.0-5FD97A?style=flat-square)](#instalação)
 [![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-5FD97A?style=flat-square)](LICENSE)
 [![Linux](https://img.shields.io/badge/Linux-Ubuntu%20%C2%B7%20Mint%20%C2%B7%20Zorin%20%C2%B7%20Debian-1A2446?style=flat-square&logo=linux&logoColor=white)](#compatibilidade)
 [![Ollama](https://img.shields.io/badge/roda%20com-Ollama-1A2446?style=flat-square)](https://ollama.com)
@@ -68,6 +68,7 @@ Pronto: esse comando instala **tudo** que o openTARS precisa, pulando o que voc�
 - o Ollama (ou usa o que já estiver rodando, inclusive em Docker)
 - um ambiente Python isolado
 - o ajudante `qwen2.5:0.5b` (~400 MB)
+- o modelo de embeddings `granite-embedding:278m` (~560 MB), que entende o pedido em milissegundos
 - **um modelo de conversa escolhido pelo seu hardware**, se você ainda não tiver nenhum: `qwen3:8b` com placa de vídeo de 6 GB ou mais, `qwen3:4b` com 12 GB de RAM ou mais, e `qwen3:1.7b` nos demais
 - o atalho no menu de aplicativos
 
@@ -103,19 +104,24 @@ sudo apt install -y --reinstall ./opentars_all.deb
 
 ```mermaid
 flowchart LR
-    P([Seu pedido]) --> A{{Ajudante<br/>qwen2.5:0.5b}}
-    A -- "ver a tela" --> V[Modelo com visão]
-    A -- "ação / busca" --> G[Modelo geral<br/>sem raciocínio]
-    A -- "Linux / sistema" --> T[Modelo geral<br/>com raciocínio]
-    A -- "escrever código" --> C[Especialista em código]
-    A -- "conversa rápida" --> R[Modelo pequeno]
+    P([Seu pedido]) --> K{Palavras-chave}
+    K -- "não bateu" --> E{{Embeddings<br/>~20 ms}}
+    E -- "em dúvida" --> A{{Ajudante<br/>qwen2.5:0.5b}}
+    K & E & A -- "ver a tela" --> V[Modelo com visão]
+    K & E & A -- "ação / busca" --> G[Modelo geral<br/>sem raciocínio]
+    K & E & A -- "Linux / sistema" --> T[Modelo geral<br/>com raciocínio]
+    K & E & A -- "escrever código" --> C[Especialista em código]
+    K & E & A -- "conversa rápida" --> R[Modelo pequeno]
     V & G & T & C & R --> F[Ferramentas<br/>apps · botões pelo nome · janelas · teclado · terminal · web]
     F --> S([Resposta])
 ```
 
-1. **O ajudante classifica** o pedido: ver a tela, ação no PC, busca, código, Linux/sistema, conversa simples ou geral. Ele é pequeno de propósito: responde rápido e fica carregado junto com o resto.
+1. **O pedido é classificado** em ver a tela, ação no PC, busca, código, Linux/sistema, conversa simples ou geral, em até três etapas, da mais rápida pra mais lenta:
+   - **palavras-chave** explícitas ("feche o Firefox", "pesquise…") resolvem na hora;
+   - **embeddings**: o pedido vira um vetor que representa o *sentido* dele e é comparado com frases de exemplo de cada tarefa, em qualquer idioma. "Minha tela ficou preta depois do update" cai em Linux/sistema sem nenhuma palavra-chave. Leva uns 20 ms;
+   - o **ajudante** `qwen2.5:0.5b` só é consultado quando os embeddings ficam em dúvida.
 2. **O openTARS escolhe o modelo** mais adequado entre os seus, dando preferência ao que cabe na VRAM, e decide se vale a pena ele "pensar" antes (programação e perguntas difíceis) ou agir direto (abrir, fechar, pesquisar, clicar). Modelo especialista em programação (`qwen2.5-coder` e parecidos) **só** atende pedido de código: pra abrir apps, clicar e pesquisar ele é ruim, então nunca é escolhido pra isso. Se um modelo falhar ao carregar, ou insistir que "não consegue" fazer algo, o pedido passa pro próximo da fila.
-3. **O modelo usa as ferramentas**: abre o app e espera a janela aparecer, aperta os botões pelo nome e lê o que a janela mostra (o visor da calculadora, por exemplo), roda comandos. Se o app não expõe os botões, cai pro print + clique na posição.
+3. **O modelo usa as ferramentas**: abre o app (mesmo que a IA esqueça de pedir) e espera a janela aparecer, aperta os botões pelo nome e lê o que a janela mostra (o visor da calculadora, por exemplo), roda comandos. Se o app não expõe os botões, cai pro print + clique na posição; se o modelo não enxerga imagens, um modelo com visão descreve a tela pra ele.
 4. **Uma conversa só** pra todos os modelos: trocar de IA no meio não faz ela esquecer o que você pediu antes.
 
 ## Uso
@@ -212,6 +218,7 @@ A IA responde no idioma escolhido, e entende pedidos em qualquer um deles: as pa
 |---|---|---|
 | `OLLAMA_HOST` | endereço do Ollama | `127.0.0.1:11434` |
 | `TARS_MODELO_AJUDANTE` | trocar o modelo ajudante | `qwen2.5:0.5b` |
+| `TARS_MODELO_EMBEDDING` | trocar o modelo de embeddings (`off` desliga) | `granite-embedding:278m`, ou outro instalado |
 | `TARS_PENSAR` | `sempre` ou `nunca` força o raciocínio da IA | automático, por tipo de pedido |
 | `TARS_IDIOMA` | idioma só desta vez, sem salvar | o escolhido no menu |
 | `TARS_CONTEXTO` | memória da IA, em tokens | 16384 com GPU de 16 GB+, senão 8192 |
@@ -271,7 +278,7 @@ A instalação ficou sem internet na hora. Rode `ollama pull qwen2.5:0.5b`.
 <details>
 <summary><b>A IA escolhe um modelo estranho pro pedido</b></summary>
 
-Rode `opentars --avaliar-classificador` pra ver o quanto o ajudante acerta no seu PC, ou fixe um modelo no seletor **IA** da janela.
+Rode `opentars --avaliar-classificador`: ele mostra quanto os embeddings e o ajudante acertam no seu PC, e em quais frases erram. Sem modelo de embeddings, rode `ollama pull granite-embedding:278m`. Os exemplos de cada tipo de pedido ficam em `tars_exemplos.py`: acrescentar ali uma frase real que caiu no lugar errado já corrige casos parecidos, sem mexer no resto do código. Também dá pra fixar um modelo no seletor **IA** da janela.
 </details>
 
 <details>
@@ -302,7 +309,7 @@ opentars --atalho off     # opcional: remove o atalho global
 sudo apt remove opentars
 ```
 
-O Ollama, os modelos baixados e os seus dados (`~/.tars_sessoes.json`, `~/.tars_log/`, `~/.config/opentars/`) são mantidos.
+O Ollama, os modelos baixados e os seus dados (`~/.tars_sessoes.json`, `~/.tars_log/`, `~/.config/opentars/`, `~/.cache/opentars/`) são mantidos.
 
 ## Para desenvolvedores
 
@@ -311,6 +318,8 @@ tars.py                 núcleo: escolha de modelo, ajudante, ferramentas, modo 
 tars_gui.py             janela e barra rápida (Tkinter), usa o tars.py por baixo
 tars_i18n.py            idiomas: carrega idiomas/*.json e guarda a escolha
 tars_acessibilidade.py  clique pelo nome (AT-SPI)
+tars_embeddings.py      classifica o pedido pelo sentido (embeddings + calibração)
+tars_exemplos.py        frases de exemplo de cada tipo de pedido
 tars_atalho.py          atalho global (GNOME, Cinnamon, MATE, XFCE)
 tars_instancia.py       instância única (a barra abre na hora)
 tars_autoteste.py       --diagnostico e --autoteste
