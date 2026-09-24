@@ -6,20 +6,24 @@
 
 **O assistente de IA local pro Linux que escolhe a IA certa pra cada pedido.**
 
-Você pede em português. Ele abre programas, clica, digita, pesquisa, olha a tela e roda comandos.<br>
+Você pede do seu jeito. Ele abre programas, clica nos botões pelo nome, digita, pesquisa, olha a tela e roda comandos.<br>
 Tudo na sua máquina, via Ollama: sem nuvem, sem conta, sem mensalidade.
 
-[![Versão 2.0](https://img.shields.io/badge/vers%C3%A3o-2.0-5FD97A?style=flat-square)](#instalação)
+[![Versão 2.5](https://img.shields.io/badge/vers%C3%A3o-2.5-5FD97A?style=flat-square)](#instalação)
 [![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-5FD97A?style=flat-square)](LICENSE)
 [![Linux](https://img.shields.io/badge/Linux-Ubuntu%20%C2%B7%20Mint%20%C2%B7%20Zorin%20%C2%B7%20Debian-1A2446?style=flat-square&logo=linux&logoColor=white)](#compatibilidade)
 [![Ollama](https://img.shields.io/badge/roda%20com-Ollama-1A2446?style=flat-square)](https://ollama.com)
-[![100% local](https://img.shields.io/badge/100%25-local-1A2446?style=flat-square)](#seguran%C3%A7a-e-privacidade)
+[![Idiomas](https://img.shields.io/badge/idiomas-PT%20%C2%B7%20EN%20%C2%B7%20ES%20%C2%B7%20FR%20%C2%B7%20DE-1A2446?style=flat-square)](#idiomas)
+[![Instagram @open.tars](https://img.shields.io/badge/Instagram-@open.tars-E4405F?style=flat-square&logo=instagram&logoColor=white)](https://www.instagram.com/open.tars/)
 
-[Instalar](#instalação) · [Como funciona](#como-funciona) · [Usar](#uso) · [Problemas comuns](#problemas-comuns)
+[Instalar](#instalação) · [Como funciona](#como-funciona) · [Usar](#uso) · [Idiomas](#idiomas) · [Problemas comuns](#problemas-comuns) · [Instagram](https://www.instagram.com/open.tars/)
 
 <br>
 
-<img src="janela.png" width="820" alt="Janela do openTARS: o pedido, a IA escolhida, as ferramentas usadas e a resposta">
+<img src="janela.png" width="820" alt="Janela do openTARS: o pedido, a IA escolhida, os botões da calculadora clicados pelo nome e a resposta">
+
+<sub>As imagens mostram a janela e a calculadora de verdade; nelas, as respostas do modelo foram roteirizadas pra demonstração.</sub><br>
+<sub>🇺🇸 <i>English:</i> openTARS is a 100% local AI assistant for Linux. The interface speaks English, Spanish, French and German too — pick it in the language menu.</sub>
 
 </div>
 
@@ -32,13 +36,13 @@ Tudo na sua máquina, via Ollama: sem nuvem, sem conta, sem mensalidade.
 <td width="33%" valign="top">
 
 ### Escolhe a IA sozinho
-Um ajudante minúsculo lê cada pedido e manda pro modelo mais adequado entre os que você já tem: o que enxerga a tela, o de programação, o geral ou o mais rápido. Tudo levando em conta o que cabe na sua placa de vídeo.
+Um ajudante minúsculo lê cada pedido e manda pro modelo mais adequado entre os que você já tem: o que enxerga a tela, o de programação, o geral ou o mais rápido. E só liga o "raciocínio" quando ele ajuda: abrir e fechar programas sai na hora.
 
 </td>
 <td width="33%" valign="top">
 
-### Mexe no seu desktop de verdade
-Abre e fecha apps pelo nome em português, enxerga as janelas abertas, tira print só da janela certa e clica nos botões. Funciona com apps do menu, Snap e Flatpak.
+### Clica pelo nome, não pela posição
+Ele aperta os botões pelo texto que aparece neles ("7", "=", "Salvar"), pela acessibilidade do Linux: sem print, sem coordenada, em milissegundos, até no Wayland. O print continua como plano B.
 
 </td>
 <td width="33%" valign="top">
@@ -60,19 +64,21 @@ wget -O /tmp/opentars.deb https://github.com/enzorcasao-ctrl/openTars-lightweigh
 
 Pronto: esse comando instala **tudo** que o openTARS precisa, pulando o que você já tiver:
 
-- todas as dependências do sistema, pelo apt
+- todas as dependências do sistema, pelo apt (inclusive a de acessibilidade, pro clique pelo nome)
 - o Ollama (ou usa o que já estiver rodando, inclusive em Docker)
 - um ambiente Python isolado
 - o ajudante `qwen2.5:0.5b` (~400 MB)
 - **um modelo de conversa escolhido pelo seu hardware**, se você ainda não tiver nenhum: `qwen3:8b` com placa de vídeo de 6 GB ou mais, `qwen3:4b` com 12 GB de RAM ou mais, e `qwen3:1.7b` nos demais
 - o atalho no menu de aplicativos
 
-Pra **atualizar**, rode o mesmo comando: o histórico de conversas é mantido.
+O instalador fala o idioma do seu sistema. Pra **atualizar**, rode o mesmo comando: o histórico de conversas e as suas escolhas são mantidos.
+
+Depois de instalar, rode uma vez `opentars --autoteste`: ele confere o ambiente e faz um teste de verdade (a IA abre a calculadora e faz 7 + 2), e salva um relatório em `~/opentars-autoteste.txt`.
 
 <details>
 <summary>Quer mais modelos?</summary>
 
-Quanto mais modelos diferentes você tiver, mais o openTARS consegue adaptar a IA ao pedido. Pra ele **ver a tela e clicar em botões**, baixe um modelo com visão e ferramentas:
+Quanto mais modelos diferentes você tiver, mais o openTARS consegue adaptar a IA ao pedido. Pra ele **ver a tela** (descrever imagens, apps sem acessibilidade), baixe um modelo com visão e ferramentas:
 
 ```bash
 ollama pull qwen3-vl:8b
@@ -98,53 +104,88 @@ sudo apt install -y --reinstall ./opentars_all.deb
 ```mermaid
 flowchart LR
     P([Seu pedido]) --> A{{Ajudante<br/>qwen2.5:0.5b}}
-    A -- "ver / clicar" --> V[Modelo com visão]
-    A -- "ação / busca" --> G[Modelo geral]
-    A -- "técnico" --> C[Modelo de código]
+    A -- "ver a tela" --> V[Modelo com visão]
+    A -- "ação / busca" --> G[Modelo geral<br/>sem raciocínio]
+    A -- "técnico" --> C[Modelo de código<br/>com raciocínio]
     A -- "conversa rápida" --> R[Modelo pequeno]
-    V & G & C & R --> F[Ferramentas<br/>apps · janelas · mouse · teclado · terminal · web]
+    V & G & C & R --> F[Ferramentas<br/>apps · botões pelo nome · janelas · teclado · terminal · web]
     F --> S([Resposta])
 ```
 
 1. **O ajudante classifica** o pedido: ver a tela, ação no PC, busca, técnico, conversa simples ou geral. Ele é pequeno de propósito: responde rápido e fica carregado junto com o resto.
-2. **O openTARS escolhe o modelo** mais adequado pra esse tipo de pedido entre os seus, dando preferência ao que cabe na VRAM. Se um falhar ao carregar, tenta o próximo.
-3. **O modelo usa as ferramentas**: abre o app e espera a janela aparecer, tira print só dela, clica nas coordenadas certas, roda comandos. Você vê cada passo na tela.
+2. **O openTARS escolhe o modelo** mais adequado entre os seus, dando preferência ao que cabe na VRAM, e decide se vale a pena ele "pensar" antes (programação e perguntas difíceis) ou agir direto (abrir, fechar, pesquisar, clicar). Se um modelo falhar ao carregar, tenta o próximo.
+3. **O modelo usa as ferramentas**: abre o app e espera a janela aparecer, aperta os botões pelo nome e lê o que a janela mostra (o visor da calculadora, por exemplo), roda comandos. Se o app não expõe os botões, cai pro print + clique na posição.
 4. **Uma conversa só** pra todos os modelos: trocar de IA no meio não faz ela esquecer o que você pediu antes.
 
 ## Uso
 
 Abra o **openTARS** no menu de aplicativos, ou rode `opentars-gui`. Prefere o terminal? Use `opentars`.
 
-<img src="boas-vindas.png" width="620" alt="Tela inicial com exemplos de pedidos">
+<img src="boas-vindas.png" width="620" alt="Tela inicial com quatro sugestões de pedido e o menu de idioma (PT-BR) no topo">
 
-Exemplos:
+A tela inicial traz quatro sugestões pra clicar (no idioma escolhido), uma de cada coisa que ele faz:
 
 ```
-abra o firefox
-abra a calculadora e clique em 7, +, 2 e =
-o que tem na minha tela?
-feche o spotify e abra o discord
-pesquise rtx 5060 no google
-quanto espaço livre tenho no disco?
+abra a calculadora e faça 12 × 8 pelos botões      clica nos botões pelo nome
+quais janelas estão abertas agora?                 enxerga o que está aberto
+procure vídeos de receita de lasanha no youtube    pesquisa na web
+quanto de memória e disco estou usando?            lê o estado do PC
 ```
+
+Outros exemplos: `feche o spotify e abra o discord`, `o que tem na minha tela?`, `como vejo meu IP no linux?`.
+
+### Barra rápida: `Ctrl+Alt+Espaço`
+
+Aperte `Ctrl+Alt+Espaço` de qualquer lugar e peça sem trocar de janela. A resposta aparece na própria barra; `Esc` fecha, `Ctrl+Enter` abre a janela completa.
+
+<img src="barra-rapida.png" width="720" alt="Barra rápida flutuando sobre a área de trabalho, com a calculadora mostrando 9">
+
+O atalho é cadastrado sozinho na primeira vez que você abre o openTARS (GNOME, Zorin, Ubuntu, Cinnamon, MATE e XFCE), sem pisar nos atalhos que você já usa. Aparece em Configurações > Teclado > Atalhos, e dá pra mudar por lá ou assim:
+
+```bash
+opentars --atalho ctrl+alt+o     # outra combinação
+opentars --atalho off            # remove
+```
+
+No KDE e em outros ambientes, cadastre à mão um atalho com o comando `opentars-gui --rapido`.
+
+### Controles
 
 | Na janela | No terminal | O que faz |
 |---|---|---|
 | **Parar** ou `Esc` | `Ctrl+C` | interrompe a resposta ou a tarefa na hora |
 | `↑` / `↓` | | repete pedidos anteriores |
 | seletor **IA** no topo | `/modelo <nome>` · `/modelo auto` | fixa um modelo ou volta pro automático |
+| menu **PT-BR ▾** no topo | `/idioma <código>` | troca o idioma |
 | **Nova conversa** | `/limpar` | começa do zero (a conversa fica salva entre usos) |
 
-Outros comandos: `opentars --version`, `opentars --setup` (refaz a configuração) e `opentars --avaliar-classificador` (mede o quanto o ajudante acerta no seu PC).
+Outros comandos:
+
+| Comando | O que faz |
+|---|---|
+| `opentars --diagnostico` | confere Ollama, modelos, GPU, tela, janelas, acessibilidade e atalho (não mexe em nada) |
+| `opentars --autoteste` | diagnóstico + precisão do ajudante + o teste real com a calculadora |
+| `opentars --avaliar-classificador` | mede o quanto o ajudante acerta no seu PC |
+| `opentars --setup` | instala o que estiver faltando (Ollama, modelos...) |
+| `opentars --help` | todos os comandos |
+
+## Idiomas
+
+A janela, o terminal, o instalador e o menu de aplicativos falam **português, inglês, espanhol, francês e alemão**. Troque no menu do topo da janela (ou com `/idioma en` / `opentars --idioma es`); a escolha fica salva. Sem escolha, vale o idioma do sistema.
+
+A IA responde no idioma escolhido, e entende pedidos em qualquer um deles: as palavras-chave consideram o idioma escolhido, o do sistema e o inglês.
+
+**Quer o openTARS no seu idioma?** Todos os textos ficam em `idiomas/<código>.json`. Copie o `en.json`, traduza os valores e salve como, por exemplo, `it.json`: o idioma novo aparece no menu sozinho, sem mexer no código. Mande um pull request!
 
 ## Compatibilidade
 
 | | Funciona | Observação |
 |---|---|---|
 | **Distros** | Ubuntu 22.04+, Debian 12+, Mint, Zorin, Pop!_OS e derivados | precisa do `apt` |
-| **Desktop** | GNOME, KDE, Cinnamon, XFCE, MATE e outros | apps do menu, Snap e Flatpak, pelo nome em português ou inglês |
+| **Desktop** | GNOME, KDE, Cinnamon, XFCE, MATE e outros | apps do menu, Snap e Flatpak, pelo nome em qualquer idioma |
 | **Sessão Xorg (X11)** | tudo | |
-| **Sessão Wayland** | conversa, abrir apps e sites, comandos, prints | cliques e digitação simulados só chegam a alguns apps (limitação do Wayland) |
+| **Sessão Wayland** | conversa, abrir apps e sites, comandos, prints e **clique pelo nome** | clique e digitação por coordenada só chegam a alguns apps (limitação do Wayland) |
+| **Clique pelo nome** | apps GTK (GNOME), Qt/KDE, Firefox, LibreOffice | jogos e alguns apps Electron não expõem os botões: aí vale o print |
 | **GPU** | NVIDIA, AMD ou só CPU | sem GPU, o modo automático evita modelos grandes demais |
 | **Ollama** | local, Docker ou outra máquina | outro endereço: variável `OLLAMA_HOST` |
 
@@ -154,6 +195,7 @@ Outros comandos: `opentars --version`, `opentars --setup` (refaz a configuraçã
 - Comandos que apagam dados ou mexem no sistema (`rm -r`, `mkfs`, `dd`, `git reset --hard`, desligar o PC...) só rodam depois da sua confirmação.
 - Comandos que pedem senha (`sudo`) não travam: falham na hora, e a IA mostra o comando pra você rodar.
 - Fechar um programa é como clicar no X: se ele perguntar "salvar alterações?", o openTARS não força.
+- Pro clique pelo nome, o openTARS liga a acessibilidade da sessão (a mesma que um leitor de tela usa) só quando precisa, e ela volta ao normal ao sair da sessão.
 - Tudo que ele executa fica registrado em `~/.tars_log/tars.log`.
 
 <details>
@@ -163,8 +205,12 @@ Outros comandos: `opentars --version`, `opentars --setup` (refaz a configuraçã
 |---|---|---|
 | `OLLAMA_HOST` | endereço do Ollama | `127.0.0.1:11434` |
 | `TARS_MODELO_AJUDANTE` | trocar o modelo ajudante | `qwen2.5:0.5b` |
+| `TARS_PENSAR` | `sempre` ou `nunca` força o raciocínio da IA | automático, por tipo de pedido |
+| `TARS_IDIOMA` | idioma só desta vez, sem salvar | o escolhido no menu |
 | `TARS_CONTEXTO` | memória da IA, em tokens | 16384 com GPU de 16 GB+, senão 8192 |
 | `TARS_LARGURA_SCREENSHOT` | largura máxima do print enviado à IA | 1280 |
+| `TARS_SEM_ACESSIBILIDADE=1` | desliga o clique pelo nome | ligado |
+| `TARS_OCIOSO_MIN` | minutos que a barra rápida fica pronta em segundo plano | 30 |
 | `TARS_SEM_CONFIRMACAO_PERIGOSOS=1` | não pedir confirmação de comandos perigosos (por sua conta e risco) | desligado |
 
 Exemplo: `TARS_CONTEXTO=32768 opentars-gui`
@@ -180,9 +226,21 @@ O openTARS já lembra ela das ferramentas automaticamente. Se continuar, use um 
 </details>
 
 <details>
-<summary><b>Cliques e digitação não fazem nada</b></summary>
+<summary><b>O clique pelo nome não acha os botões de um app</b></summary>
 
-Provavelmente a sessão é Wayland. Na tela de login, clique na engrenagem e escolha a opção com "Xorg" no nome (no Ubuntu, "Ubuntu on Xorg").
+Rode `opentars --diagnostico` e veja a linha "Clique pelo nome". Apps Qt/KDE passam a aparecer depois da primeira vez que o openTARS usa a acessibilidade (reabra o app). Jogos e alguns apps Electron não expõem os botões: nesses, a IA usa o print e clica pela posição (melhor com um modelo com visão).
+</details>
+
+<details>
+<summary><b>O atalho Ctrl+Alt+Espaço não faz nada</b></summary>
+
+Rode `opentars --atalho` pra ver a situação. Se a combinação já era usada por outra coisa, escolha outra (`opentars --atalho ctrl+alt+o`). No KDE, cadastre à mão o comando `opentars-gui --rapido`.
+</details>
+
+<details>
+<summary><b>Cliques por posição e digitação não fazem nada</b></summary>
+
+Provavelmente a sessão é Wayland. O clique pelo nome funciona; pro resto, na tela de login clique na engrenagem e escolha a opção com "Xorg" no nome (no Ubuntu, "Ubuntu on Xorg").
 </details>
 
 <details>
@@ -220,35 +278,47 @@ O arquivo não está na pasta atual. Entre na pasta onde ele foi baixado (`cd ~/
 
 - **Ollama não instalou** (sem internet na hora): instale em [ollama.com/download](https://ollama.com/download) e rode `opentars --setup`.
 - **Interface gráfica não abre**: `sudo apt install python3-tk` e depois `opentars --setup`.
+- **Precisa de ajuda?** Rode `opentars --autoteste` e mande o arquivo `~/opentars-autoteste.txt`.
 - **Vindo de uma versão antiga?** O ajudante anterior (`gemma3:270m`) não é mais usado. Pra liberar espaço: `ollama rm gemma3:270m`.
 </details>
 
 ## Desinstalar
 
 ```bash
+opentars --atalho off     # opcional: remove o atalho global
 sudo apt remove opentars
 ```
 
-O Ollama, os modelos baixados e o seu histórico (`~/.tars_sessoes.json`, `~/.tars_log/`) são mantidos.
+O Ollama, os modelos baixados e os seus dados (`~/.tars_sessoes.json`, `~/.tars_log/`, `~/.config/opentars/`) são mantidos.
 
 ## Para desenvolvedores
 
 ```
-tars.py            núcleo: escolha de modelo, ajudante, ferramentas de desktop e janelas, modo terminal
-tars_gui.py        interface gráfica (Tkinter), usa o tars.py por baixo
-tests/             testes automatizados (os de janela rodam de verdade num Xvfb + openbox, se houver)
-empacotamento/     tudo que vira o .deb (setup.sh, lançadores, atalhos, ícone, scripts do Debian)
-logo.svg, janela.png, boas-vindas.png   imagens deste README
+tars.py                 núcleo: escolha de modelo, ajudante, ferramentas, modo terminal
+tars_gui.py             janela e barra rápida (Tkinter), usa o tars.py por baixo
+tars_i18n.py            idiomas: carrega idiomas/*.json e guarda a escolha
+tars_acessibilidade.py  clique pelo nome (AT-SPI)
+tars_atalho.py          atalho global (GNOME, Cinnamon, MATE, XFCE)
+tars_instancia.py       instância única (a barra abre na hora)
+tars_autoteste.py       --diagnostico e --autoteste
+idiomas/                um arquivo por idioma: todos os textos
+tests/                  testes (os de janela e de acessibilidade rodam de verdade num Xvfb, com a calculadora do GNOME)
+empacotamento/          tudo que vira o .deb (setup.sh, lançadores, modelos dos atalhos, ícone, scripts do Debian)
+logo.svg, *.png         imagens deste README
 ```
 
 ```bash
-python3 tars.py                 # terminal (precisa de requests, psutil, pyautogui, pillow e python3-tk)
+python3 tars.py                 # terminal (precisa de requests, psutil, pyautogui, pillow, python3-tk e python3-gi)
 python3 tars_gui.py             # interface gráfica
 python3 tests/run_all.py        # testes
 bash empacotamento/build.sh     # gera o .deb em dist/
 ```
 
 A versão fica na constante `VERSAO` do `tars.py` (o `build.sh` lê de lá) e no topo de `empacotamento/doc/changelog`.
+
+## Acompanhe
+
+Novidades, bastidores e o que vem por aí: **[@open.tars no Instagram](https://www.instagram.com/open.tars/)**.
 
 ## Licença
 
