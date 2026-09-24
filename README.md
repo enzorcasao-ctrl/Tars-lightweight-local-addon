@@ -9,7 +9,7 @@
 Você pede do seu jeito. Ele abre programas, clica nos botões pelo nome, digita, pesquisa, olha a tela e roda comandos.<br>
 Tudo na sua máquina, via Ollama: sem nuvem, sem conta, sem mensalidade.
 
-[![Versão 2.5](https://img.shields.io/badge/vers%C3%A3o-2.5-5FD97A?style=flat-square)](#instalação)
+[![Versão 2.5.1](https://img.shields.io/badge/vers%C3%A3o-2.5.1-5FD97A?style=flat-square)](#instalação)
 [![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-5FD97A?style=flat-square)](LICENSE)
 [![Linux](https://img.shields.io/badge/Linux-Ubuntu%20%C2%B7%20Mint%20%C2%B7%20Zorin%20%C2%B7%20Debian-1A2446?style=flat-square&logo=linux&logoColor=white)](#compatibilidade)
 [![Ollama](https://img.shields.io/badge/roda%20com-Ollama-1A2446?style=flat-square)](https://ollama.com)
@@ -106,14 +106,15 @@ flowchart LR
     P([Seu pedido]) --> A{{Ajudante<br/>qwen2.5:0.5b}}
     A -- "ver a tela" --> V[Modelo com visão]
     A -- "ação / busca" --> G[Modelo geral<br/>sem raciocínio]
-    A -- "técnico" --> C[Modelo de código<br/>com raciocínio]
+    A -- "Linux / sistema" --> T[Modelo geral<br/>com raciocínio]
+    A -- "escrever código" --> C[Especialista em código]
     A -- "conversa rápida" --> R[Modelo pequeno]
-    V & G & C & R --> F[Ferramentas<br/>apps · botões pelo nome · janelas · teclado · terminal · web]
+    V & G & T & C & R --> F[Ferramentas<br/>apps · botões pelo nome · janelas · teclado · terminal · web]
     F --> S([Resposta])
 ```
 
-1. **O ajudante classifica** o pedido: ver a tela, ação no PC, busca, técnico, conversa simples ou geral. Ele é pequeno de propósito: responde rápido e fica carregado junto com o resto.
-2. **O openTARS escolhe o modelo** mais adequado entre os seus, dando preferência ao que cabe na VRAM, e decide se vale a pena ele "pensar" antes (programação e perguntas difíceis) ou agir direto (abrir, fechar, pesquisar, clicar). Se um modelo falhar ao carregar, tenta o próximo.
+1. **O ajudante classifica** o pedido: ver a tela, ação no PC, busca, código, Linux/sistema, conversa simples ou geral. Ele é pequeno de propósito: responde rápido e fica carregado junto com o resto.
+2. **O openTARS escolhe o modelo** mais adequado entre os seus, dando preferência ao que cabe na VRAM, e decide se vale a pena ele "pensar" antes (programação e perguntas difíceis) ou agir direto (abrir, fechar, pesquisar, clicar). Modelo especialista em programação (`qwen2.5-coder` e parecidos) **só** atende pedido de código: pra abrir apps, clicar e pesquisar ele é ruim, então nunca é escolhido pra isso. Se um modelo falhar ao carregar, ou insistir que "não consegue" fazer algo, o pedido passa pro próximo da fila.
 3. **O modelo usa as ferramentas**: abre o app e espera a janela aparecer, aperta os botões pelo nome e lê o que a janela mostra (o visor da calculadora, por exemplo), roda comandos. Se o app não expõe os botões, cai pro print + clique na posição.
 4. **Uma conversa só** pra todos os modelos: trocar de IA no meio não faz ela esquecer o que você pediu antes.
 
@@ -125,14 +126,20 @@ Abra o **openTARS** no menu de aplicativos, ou rode `opentars-gui`. Prefere o te
 
 A tela inicial traz quatro sugestões pra clicar (no idioma escolhido), uma de cada coisa que ele faz:
 
-```
-abra a calculadora e faça 12 × 8 pelos botões      clica nos botões pelo nome
-quais janelas estão abertas agora?                 enxerga o que está aberto
-procure vídeos de receita de lasanha no youtube    pesquisa na web
-quanto de memória e disco estou usando?            lê o estado do PC
-```
+| Sugestão | O que mostra |
+|---|---|
+| Abra a calculadora e faça 12 × 8 pelos botões | clica nos botões pelo nome |
+| Quais janelas estão abertas agora? | enxerga o que está aberto |
+| Procure vídeos de receita de lasanha no YouTube | pesquisa na web |
+| Quanto de memória e disco estou usando? | lê o estado do PC |
 
 Outros exemplos: `feche o spotify e abra o discord`, `o que tem na minha tela?`, `como vejo meu IP no linux?`.
+
+### Código com botão de copiar
+
+Peça um script, uma função ou um comando e o código vem numa janelinha própria, com a linguagem no topo e o botão **Copiar** (copia só o código), como no Claude e no ChatGPT. Pedido de código vai pro seu modelo especialista em programação, se você tiver um (`qwen2.5-coder`, `codestral`, `deepseek-coder`...).
+
+<img src="codigo.png" width="720" alt="Resposta com um script Python numa janela de código com o botão Copiar">
 
 ### Barra rápida: `Ctrl+Alt+Espaço`
 
@@ -222,7 +229,7 @@ Exemplo: `TARS_CONTEXTO=32768 opentars-gui`
 <details>
 <summary><b>A IA diz que "não consegue" abrir ou fechar um programa</b></summary>
 
-O openTARS já lembra ela das ferramentas automaticamente. Se continuar, use um modelo de conversa geral (ex: `qwen3:8b`). Modelos só de programação, como o `qwen2.5-coder`, são ruins pra controlar o desktop, e o modo automático já evita eles nessas tarefas.
+O openTARS lembra ela das ferramentas e, se ela recusar de novo, passa o pedido pro próximo modelo. Modelos só de programação, como o `qwen2.5-coder`, nunca são escolhidos pra controlar o desktop no modo automático. Se você fixou um deles no seletor **IA**, volte pro **Automático**. Pra isso funcionar, tenha pelo menos um modelo geral (ex: `qwen3:8b`).
 </details>
 
 <details>
@@ -304,7 +311,7 @@ tars_autoteste.py       --diagnostico e --autoteste
 idiomas/                um arquivo por idioma: todos os textos
 tests/                  testes (os de janela e de acessibilidade rodam de verdade num Xvfb, com a calculadora do GNOME)
 empacotamento/          tudo que vira o .deb (setup.sh, lançadores, modelos dos atalhos, ícone, scripts do Debian)
-logo.svg, *.png         imagens deste README
+logo.svg, *.png         imagens deste README (janela.png, boas-vindas.png, barra-rapida.png, codigo.png)
 ```
 
 ```bash
