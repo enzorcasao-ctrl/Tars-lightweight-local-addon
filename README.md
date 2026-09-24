@@ -9,7 +9,7 @@
 Você pede do seu jeito. Ele abre programas, clica nos botões pelo nome, digita, pesquisa, olha a tela e roda comandos.<br>
 Tudo na sua máquina, via Ollama: sem nuvem, sem conta, sem mensalidade.
 
-[![Versão 2.6.0](https://img.shields.io/badge/vers%C3%A3o-2.6.0-5FD97A?style=flat-square)](#instalação)
+[![Versão 2.6.1](https://img.shields.io/badge/vers%C3%A3o-2.6.1-5FD97A?style=flat-square)](#instalação)
 [![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-5FD97A?style=flat-square)](LICENSE)
 [![Linux](https://img.shields.io/badge/Linux-Ubuntu%20%C2%B7%20Mint%20%C2%B7%20Zorin%20%C2%B7%20Debian-1A2446?style=flat-square&logo=linux&logoColor=white)](#compatibilidade)
 [![Ollama](https://img.shields.io/badge/roda%20com-Ollama-1A2446?style=flat-square)](https://ollama.com)
@@ -242,7 +242,7 @@ O openTARS lembra ela das ferramentas e, se ela recusar de novo, passa o pedido 
 <details>
 <summary><b>O clique pelo nome não acha os botões de um app</b></summary>
 
-Rode `opentars --diagnostico` e veja a linha "Clique pelo nome". Apps Qt/KDE passam a aparecer depois da primeira vez que o openTARS usa a acessibilidade (reabra o app). Jogos e alguns apps Electron não expõem os botões: nesses, a IA usa o print e clica pela posição (melhor com um modelo com visão).
+Apps feitos em Electron (Claude, Discord, VS Code, Slack…) só mostram os botões quando abertos pelo openTARS: se o app já estava aberto antes, feche e peça pra IA abrir de novo. Enquanto isso, ela escreve com o teclado e clica pela posição. Rode `opentars --diagnostico` e veja a linha "Clique pelo nome". Apps Qt/KDE passam a aparecer depois da primeira vez que o openTARS usa a acessibilidade (reabra o app). Jogos e alguns apps Electron não expõem os botões: nesses, a IA usa o print e clica pela posição (melhor com um modelo com visão).
 </details>
 
 <details>
