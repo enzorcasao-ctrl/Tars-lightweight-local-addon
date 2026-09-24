@@ -58,26 +58,29 @@ Pra Ubuntu, Debian, Linux Mint, Zorin OS, Pop!_OS e derivados. Cole no terminal:
 wget -O /tmp/opentars.deb https://github.com/enzorcasao-ctrl/openTars-lightweight-local-addon/raw/main/opentars_all.deb && sudo apt install -y --reinstall /tmp/opentars.deb
 ```
 
-O mesmo comando **instala e atualiza**, e o histórico de conversas é mantido. O instalador pula o que você já tiver e cuida de:
+Pronto: esse comando instala **tudo** que o openTARS precisa, pulando o que você já tiver:
 
-- instalar o Ollama (ou usar o que já estiver rodando, inclusive em Docker)
-- criar um ambiente Python isolado com as dependências
-- baixar o ajudante `qwen2.5:0.5b` (~400 MB)
-- colocar o openTARS no menu de aplicativos
+- todas as dependências do sistema, pelo apt
+- o Ollama (ou usa o que já estiver rodando, inclusive em Docker)
+- um ambiente Python isolado
+- o ajudante `qwen2.5:0.5b` (~400 MB)
+- **um modelo de conversa escolhido pelo seu hardware**, se você ainda não tiver nenhum: `qwen3:8b` com placa de vídeo de 6 GB ou mais, `qwen3:4b` com 12 GB de RAM ou mais, e `qwen3:1.7b` nos demais
+- o atalho no menu de aplicativos
 
-Depois, baixe pelo menos um modelo de conversa:
+Pra **atualizar**, rode o mesmo comando: o histórico de conversas é mantido.
+
+<details>
+<summary>Quer mais modelos?</summary>
+
+Quanto mais modelos diferentes você tiver, mais o openTARS consegue adaptar a IA ao pedido. Pra ele **ver a tela e clicar em botões**, baixe um modelo com visão e ferramentas:
 
 ```bash
-ollama pull qwen3:8b
+ollama pull qwen3-vl:8b
 ```
 
-| Seu PC | Sugestão de modelo |
-|---|---|
-| Sem placa de vídeo, 16 GB de RAM | `qwen3:4b` |
-| Placa com 8 GB ou mais | `qwen3:8b` |
-| Pra ele ver a tela e clicar em botões | um modelo com visão **e** ferramentas, como `qwen3-vl:8b` |
+Pra escolher outro modelo de conversa na instalação, coloque `TARS_MODELO_CONVERSA=qwen3:14b` antes do `apt install` (ex: `sudo TARS_MODELO_CONVERSA=qwen3:14b apt install -y --reinstall /tmp/opentars.deb`). Pra não baixar nenhum: `TARS_SEM_MODELO=1`.
 
-Quanto mais modelos diferentes você tiver, mais o openTARS consegue adaptar a IA ao pedido.
+</details>
 
 <details>
 <summary>Prefere baixar o arquivo manualmente?</summary>
