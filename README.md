@@ -9,7 +9,7 @@
 Você pede do seu jeito. Ele abre programas, clica nos botões pelo nome, digita, pesquisa, olha a tela e roda comandos.<br>
 Tudo na sua máquina, via Ollama: sem nuvem, sem conta, sem mensalidade.
 
-[![Versão 2.6.1](https://img.shields.io/badge/vers%C3%A3o-2.6.1-5FD97A?style=flat-square)](#instalação)
+[![Versão 2.6.2](https://img.shields.io/badge/vers%C3%A3o-2.6.2-5FD97A?style=flat-square)](#instalação)
 [![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-5FD97A?style=flat-square)](LICENSE)
 [![Linux](https://img.shields.io/badge/Linux-Ubuntu%20%C2%B7%20Mint%20%C2%B7%20Zorin%20%C2%B7%20Debian-1A2446?style=flat-square&logo=linux&logoColor=white)](#compatibilidade)
 [![Ollama](https://img.shields.io/badge/roda%20com-Ollama-1A2446?style=flat-square)](https://ollama.com)
