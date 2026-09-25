@@ -179,7 +179,6 @@ Pedido com várias etapas ("abre o gmail e depois o spotify") vira um **plano** 
 
 - **Voz, 100% local:** diga **"TARS, abre o Firefox"**. Um Whisper pequenininho fica ouvindo só o nome; o pedido é transcrito por um maior (faster-whisper, na CPU), e a resposta sai falada pelo Piper. `Ctrl+M` (ou **Voz ▾ → Falar agora**) fala sem precisar dizer "TARS". Liga no botão **Voz** da janela ou com `opentars --voz` no terminal.
   - **Responde rápido (3.0 Miller):** os modelos já ficam carregados; o nome é conferido enquanto você ainda fala (a tela mostra na hora que ouviu); no fim da frase só falta entender o pedido. "TARS" sozinho: ele responde **"Sim?"** e espera o pedido. Depois de responder falando, dá pra continuar a conversa **sem dizer "TARS"** por alguns segundos.
-  - **Em português de verdade:** entende "Társ", "Tarsi", "Tás,", "E aí Tars", "Ô Tarz"; o Whisper recebe uma frase de exemplo em português (não "traduz" o pedido pro inglês) e o "Sim?" sai na voz brasileira.
 - **Rotinas:** "todo dia às 8h abre o gmail e o spotify", "dias úteis às 18h fecha o discord", "daqui a 10 minutos me lembra de tirar o bolo". Na hora, o pedido entra sozinho (com notificação do sistema), enquanto o openTARS estiver aberto (janela, barra rápida ou terminal). Ficam em `~/.config/opentars/rotinas.json`.
 - **Memória:** "lembra que meu navegador é o Brave", "minha pasta de projetos é ~/dev". Vale pra toda conversa daqui pra frente; "esquece o do Brave" apaga. Fica em `~/.config/opentars/memoria.json`.
 
