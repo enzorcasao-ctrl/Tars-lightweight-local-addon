@@ -9,7 +9,7 @@
 Você pede do seu jeito. Ele abre programas, clica nos botões pelo nome, digita, pesquisa, olha a tela e roda comandos.<br>
 Tudo na sua máquina, via Ollama: sem nuvem, sem conta, sem mensalidade.
 
-[![Versão 2.6.2](https://img.shields.io/badge/vers%C3%A3o-2.6.2-5FD97A?style=flat-square)](#instalação)
+[![Versão 2.9.0](https://img.shields.io/badge/vers%C3%A3o-2.9.0-5FD97A?style=flat-square)](#instalação)
 [![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-5FD97A?style=flat-square)](LICENSE)
 [![Linux](https://img.shields.io/badge/Linux-Ubuntu%20%C2%B7%20Mint%20%C2%B7%20Zorin%20%C2%B7%20Debian-1A2446?style=flat-square&logo=linux&logoColor=white)](#compatibilidade)
 [![Ollama](https://img.shields.io/badge/roda%20com-Ollama-1A2446?style=flat-square)](https://ollama.com)
@@ -69,6 +69,7 @@ Pronto: esse comando instala **tudo** que o openTARS precisa, pulando o que voc�
 - um ambiente Python isolado
 - o ajudante `qwen2.5:0.5b` (~400 MB)
 - o modelo de embeddings `granite-embedding:278m` (~560 MB), que entende o pedido em milissegundos
+- o leitor de texto da tela (OCR `tesseract`), pra clicar em apps que não mostram os botões pra acessibilidade
 - **um modelo de conversa escolhido pelo seu hardware**, se você ainda não tiver nenhum: `qwen3:8b` com placa de vídeo de 6 GB ou mais, `qwen3:4b` com 12 GB de RAM ou mais, e `qwen3:1.7b` nos demais
 - o atalho no menu de aplicativos
 
@@ -104,25 +105,67 @@ sudo apt install -y --reinstall ./opentars_all.deb
 
 ```mermaid
 flowchart LR
-    P([Seu pedido]) --> K{Palavras-chave}
-    K -- "não bateu" --> E{{Embeddings<br/>~20 ms}}
-    E -- "em dúvida" --> A{{Ajudante<br/>qwen2.5:0.5b}}
-    K & E & A -- "ver a tela" --> V[Modelo com visão]
-    K & E & A -- "ação / busca" --> G[Modelo geral<br/>sem raciocínio]
-    K & E & A -- "Linux / sistema" --> T[Modelo geral<br/>com raciocínio]
-    K & E & A -- "escrever código" --> C[Especialista em código]
-    K & E & A -- "conversa rápida" --> R[Modelo pequeno]
-    V & G & T & C & R --> F[Ferramentas<br/>apps · botões pelo nome · janelas · teclado · terminal · web]
+    P([Seu pedido]) --> L{{"Camadas<br/>palavras · contexto · formato<br/>apps · embeddings"}}
+    L -- "empate" --> A{{"Ajudante<br/>só entre as finalistas"}}
+    L & A --> M["Fila de modelos<br/>tamanho · VRAM · acertos no seu PC"]
+    M --> IA["IA de conversa<br/>pensa antes se tiver várias etapas"]
+    IA --> F["Ferramentas<br/>acessibilidade · OCR · visão · teclado · terminal · web"]
+    F -- "nada funcionou" --> M
     F --> S([Resposta])
 ```
 
-1. **O pedido é classificado** em ver a tela, ação no PC, busca, código, Linux/sistema, conversa simples ou geral, em até três etapas, da mais rápida pra mais lenta:
-   - **palavras-chave** explícitas ("feche o Firefox", "pesquise…") resolvem na hora;
-   - **embeddings**: o pedido vira um vetor que representa o *sentido* dele e é comparado com frases de exemplo de cada tarefa, em qualquer idioma. "Minha tela ficou preta depois do update" cai em Linux/sistema sem nenhuma palavra-chave. Leva uns 20 ms;
-   - o **ajudante** `qwen2.5:0.5b` só é consultado quando os embeddings ficam em dúvida.
-2. **O openTARS escolhe o modelo** mais adequado entre os seus, dando preferência ao que cabe na VRAM, e decide se vale a pena ele "pensar" antes (programação e perguntas difíceis) ou agir direto (abrir, fechar, pesquisar, clicar). Modelo especialista em programação (`qwen2.5-coder` e parecidos) **só** atende pedido de código: pra abrir apps, clicar e pesquisar ele é ruim, então nunca é escolhido pra isso. Se um modelo falhar ao carregar, ou insistir que "não consegue" fazer algo, o pedido passa pro próximo da fila.
-3. **O modelo usa as ferramentas**: abre o app (mesmo que a IA esqueça de pedir) e espera a janela aparecer, aperta os botões pelo nome e lê o que a janela mostra (o visor da calculadora, por exemplo), roda comandos. Se o app não expõe os botões, cai pro print + clique na posição; se o modelo não enxerga imagens, um modelo com visão descreve a tela pra ele.
-4. **Uma conversa só** pra todos os modelos: trocar de IA no meio não faz ela esquecer o que você pediu antes.
+### 1. Várias camadas decidem o tipo do pedido
+
+Cada camada olha o pedido de um jeito e dá votos. Quando uma delas é clara, as outras nem precisam rodar:
+
+| Camada | O que olha | Exemplo |
+|---|---|---|
+| **Palavras-chave** | verbo ou alvo explícito | "**feche** o Firefox" → ação, na hora |
+| **Contexto** | continuação do pedido anterior | "agora clica no =" depois de abrir a calculadora → ação |
+| **Formato** | código colado, erro, comando, link, pergunta | um `Traceback` → código; `E: dpkg...` → Linux/sistema |
+| **Apps** | cita um app instalado | "o spotify tá mudo" → ação |
+| **Embeddings** | o *sentido*, comparado com frases de exemplo, em qualquer idioma (~20 ms) | "minha tela ficou preta depois do update" → Linux/sistema |
+| **Ajudante** | só se as camadas empatarem: escolhe **só entre as 2–3 finalistas**, recebendo as pistas das outras camadas e escrevendo o motivo antes de escolher | "quero umas receitas de lasanha pra assistir" → busca |
+| **Coerência** | corrige resultado sem sentido | "conversa simples" num pedido de 20 palavras → geral |
+
+A camada também percebe **pedidos com várias etapas** ("abre o Claude **e** faz uma pergunta"). Nesses, a IA pensa antes de agir, recebe um lembrete de fazer tudo e o pedido vai pro maior modelo que roda bem no seu PC.
+
+Pra ver o raciocínio de um pedido, camada por camada, e a fila de modelos:
+
+```bash
+opentars --explicar "abre o claude e faz uma pergunta simples"
+```
+
+### 2. A fila de modelos aprende com o seu PC
+
+O openTARS escolhe entre os modelos que você tem, pelo tamanho e pelo que cabe na VRAM. Especialistas em programação (`qwen2.5-coder` e parecidos) **só** atendem código. E ele anota, por tarefa, se cada modelo deu certo ou falhou nas últimas vezes: quem falha a maioria das vezes numa tarefa desce na fila **daquela** tarefa, e volta a subir se passar a acertar.
+
+### 3. A IA trabalha com rede de segurança
+
+- **Chamadas malfeitas são consertadas:** `open_app` vira `open_application`, `app_name` vira `app`, `"120"` vira `120`.
+- **"Pronto!" sem ter feito nada é cobrado:** se a IA diz que abriu, clicou ou enviou sem ter chamado a ferramenta, ou logo depois de uma que falhou, ela é mandada fazer de verdade (ou contar o que deu errado).
+- **Ela sabe o que está aberto:** num pedido de ação, recebe a lista de janelas abertas e qual tem o foco.
+- **Não anda em círculos:**
+  - repetir exatamente o que já falhou nem roda de novo;
+  - 3 falhas da mesma ferramenta: ela é mandada mudar de estratégia;
+  - 8 falhas seguidas: o próximo modelo da fila assume a mesma conversa, vendo o que já falhou.
+- **Modelo que quebra ou recusa passa o pedido adiante:** sem memória, erro do Ollama ou "não consigo" insistente mandam o pedido pro próximo modelo da fila.
+- **Ferramentas por tarefa:** uma busca recebe só as ferramentas de busca, e modelo pequeno erra bem menos com menos opções. Se precisar, ela ganha todas.
+
+### 4. Apps sem acessibilidade também funcionam
+
+O clique pelo nome tenta, nesta ordem:
+
+1. **Acessibilidade:** aperta o botão pelo nome, sem mouse e sem print (apps GTK, Qt, Firefox, LibreOffice…).
+2. **Texto na tela (OCR):** apps que não expõem os botões (Claude, Discord, VS Code, jogos, apps Java) têm a janela lida pelo `tesseract`, e o clique vai onde o texto está escrito. O `list_elements` devolve os textos que a janela mostra, e o `type_in_element` acha o campo pelo texto dele ("Pergunte algo…"), clica, digita e envia.
+3. **Visão, em grade:** ícone sem texto ("ícone de enviar")? Um modelo com visão, se você tiver um, aponta o lugar numa grade (A1, B2…) em três rodadas de zoom, e o openTARS mira no centro do ícone. Funciona com qualquer modelo com visão, porque ele só precisa dizer a célula, não coordenadas.
+4. **Teclado:** sem nada disso, a IA escreve no campo que tem o foco.
+
+Apps Electron (Claude, Discord, VS Code…) abertos **pelo openTARS** já saem com a acessibilidade ligada. Aí o clique pelo nome funciona neles direto.
+
+### 5. Uma conversa só
+
+Todos os modelos compartilham a mesma conversa: trocar de IA no meio não faz ela esquecer o que você pediu antes.
 
 ## Uso
 
@@ -178,7 +221,8 @@ Outros comandos:
 |---|---|
 | `opentars --diagnostico` | confere Ollama, modelos, GPU, tela, janelas, acessibilidade e atalho (não mexe em nada) |
 | `opentars --autoteste` | diagnóstico + precisão do ajudante + o teste real com a calculadora |
-| `opentars --avaliar-classificador` | mede o quanto o ajudante acerta no seu PC |
+| `opentars --avaliar-classificador` | mede o quanto os embeddings e o ajudante acertam no seu PC |
+| `opentars --explicar "pedido"` | mostra, camada por camada, como a tarefa e o modelo são escolhidos |
 | `opentars --setup` | instala o que estiver faltando (Ollama, modelos...) |
 | `opentars --help` | todos os comandos |
 
@@ -198,7 +242,7 @@ A IA responde no idioma escolhido, e entende pedidos em qualquer um deles: as pa
 | **Desktop** | GNOME, KDE, Cinnamon, XFCE, MATE e outros | apps do menu, Snap e Flatpak, pelo nome em qualquer idioma |
 | **Sessão Xorg (X11)** | tudo | |
 | **Sessão Wayland** | conversa, abrir apps e sites, comandos, prints e **clique pelo nome** | clique e digitação por coordenada só chegam a alguns apps (limitação do Wayland) |
-| **Clique pelo nome** | apps GTK (GNOME), Qt/KDE, Firefox, LibreOffice | jogos e alguns apps Electron não expõem os botões: aí vale o print |
+| **Clique pelo nome** | apps GTK (GNOME), Qt/KDE, Firefox, LibreOffice e, lendo a tela, qualquer app que mostre o texto (Electron, jogos, Java) | ícone sem texto: precisa de um modelo com visão (ex: `qwen3-vl:8b`); o clique lendo a tela precisa de sessão X11 |
 | **GPU** | NVIDIA, AMD ou só CPU | sem GPU, o modo automático evita modelos grandes demais |
 | **Ollama** | local, Docker ou outra máquina | outro endereço: variável `OLLAMA_HOST` |
 
@@ -209,6 +253,8 @@ A IA responde no idioma escolhido, e entende pedidos em qualquer um deles: as pa
 - Comandos que pedem senha (`sudo`) não travam: falham na hora, e a IA mostra o comando pra você rodar.
 - Fechar um programa é como clicar no X: se ele perguntar "salvar alterações?", o openTARS não força.
 - Pro clique pelo nome, o openTARS liga a acessibilidade da sessão (a mesma que um leitor de tela usa) só quando precisa, e ela volta ao normal ao sair da sessão.
+- A leitura da tela (OCR) e a visão rodam no seu PC, como todo o resto.
+- O histórico de acertos dos modelos fica em `~/.cache/opentars/historico_modelos.json` (apague pra zerar).
 - Tudo que ele executa fica registrado em `~/.tars_log/tars.log`.
 
 <details>
@@ -224,6 +270,8 @@ A IA responde no idioma escolhido, e entende pedidos em qualquer um deles: as pa
 | `TARS_CONTEXTO` | memória da IA, em tokens | 16384 com GPU de 16 GB+, senão 8192 |
 | `TARS_LARGURA_SCREENSHOT` | largura máxima do print enviado à IA | 1280 |
 | `TARS_SEM_ACESSIBILIDADE=1` | desliga o clique pelo nome | ligado |
+| `TARS_CLIQUE_POR_VISAO=0` | não usa o modelo com visão pra achar ícones sem texto | ligado |
+| `TARS_CONTEXTO_JANELAS=0` | não conta pra IA quais janelas estão abertas | ligado |
 | `TARS_OCIOSO_MIN` | minutos que a barra rápida fica pronta em segundo plano | 30 |
 | `TARS_SEM_CONFIRMACAO_PERIGOSOS=1` | não pedir confirmação de comandos perigosos (por sua conta e risco) | desligado |
 
@@ -242,7 +290,12 @@ O openTARS lembra ela das ferramentas e, se ela recusar de novo, passa o pedido 
 <details>
 <summary><b>O clique pelo nome não acha os botões de um app</b></summary>
 
-Apps feitos em Electron (Claude, Discord, VS Code, Slack…) só mostram os botões quando abertos pelo openTARS: se o app já estava aberto antes, feche e peça pra IA abrir de novo. Enquanto isso, ela escreve com o teclado e clica pela posição. Rode `opentars --diagnostico` e veja a linha "Clique pelo nome". Apps Qt/KDE passam a aparecer depois da primeira vez que o openTARS usa a acessibilidade (reabra o app). Jogos e alguns apps Electron não expõem os botões: nesses, a IA usa o print e clica pela posição (melhor com um modelo com visão).
+Quando o app não mostra os botões pra acessibilidade, o openTARS lê o texto da tela. Se nem isso achar, confira:
+
+- **É um ícone sem texto?** Tenha um modelo com visão (`ollama pull qwen3-vl:8b`, ou `gemma3:4b` com pouca VRAM) e peça descrevendo o ícone ("clica no ícone de enviar").
+- **É um app Electron** (Claude, Discord, VS Code…) que já estava aberto? Feche e peça pro openTARS abrir: aberto por ele, o app sai com a acessibilidade ligada.
+- **Sessão Wayland?** O clique lendo a tela precisa de X11. Na tela de login, escolha "Ubuntu on Xorg" (ou equivalente).
+- Rode `opentars --diagnostico` e veja as linhas "Clique pelo nome" e "OCR". Apps Qt/KDE passam a aparecer depois da primeira vez que o openTARS usa a acessibilidade (reabra o app).
 </details>
 
 <details>
@@ -278,7 +331,9 @@ A instalação ficou sem internet na hora. Rode `ollama pull qwen2.5:0.5b`.
 <details>
 <summary><b>A IA escolhe um modelo estranho pro pedido</b></summary>
 
-Rode `opentars --avaliar-classificador`: ele mostra quanto os embeddings e o ajudante acertam no seu PC, e em quais frases erram. Sem modelo de embeddings, rode `ollama pull granite-embedding:278m`. Os exemplos de cada tipo de pedido ficam em `tars_exemplos.py`: acrescentar ali uma frase real que caiu no lugar errado já corrige casos parecidos, sem mexer no resto do código. Também dá pra fixar um modelo no seletor **IA** da janela.
+Rode `opentars --explicar "o seu pedido"`: ele mostra o que cada camada achou, a tarefa decidida, a fila de modelos e o placar de cada um no seu PC.
+
+Pra medir o acerto geral, use `opentars --avaliar-classificador`, que mostra quanto os embeddings e o ajudante acertam e em quais frases erram. Sem modelo de embeddings, rode `ollama pull granite-embedding:278m`. Os exemplos de cada tipo de pedido ficam em `tars_exemplos.py`: acrescentar ali uma frase real que caiu no lugar errado já corrige casos parecidos. Também dá pra fixar um modelo no seletor **IA** da janela.
 </details>
 
 <details>
@@ -318,8 +373,10 @@ tars.py                 núcleo: escolha de modelo, ajudante, ferramentas, modo 
 tars_gui.py             janela e barra rápida (Tkinter), usa o tars.py por baixo
 tars_i18n.py            idiomas: carrega idiomas/*.json e guarda a escolha
 tars_acessibilidade.py  clique pelo nome (AT-SPI)
+tars_escolha.py         camadas de escolha da tarefa, pedidos com várias etapas, histórico dos modelos
 tars_embeddings.py      classifica o pedido pelo sentido (embeddings + calibração)
 tars_exemplos.py        frases de exemplo de cada tipo de pedido
+tars_ocr.py             lê a tela (tesseract) e acha ícones com um modelo de visão em grade
 tars_atalho.py          atalho global (GNOME, Cinnamon, MATE, XFCE)
 tars_instancia.py       instância única (a barra abre na hora)
 tars_autoteste.py       --diagnostico e --autoteste
