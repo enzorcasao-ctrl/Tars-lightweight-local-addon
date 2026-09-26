@@ -167,6 +167,7 @@ O clique pelo nome tenta, nesta ordem:
 
 - **Arrastar de verdade:** `drag_mouse` segura o botão, sai devagar do lugar (o Chrome/Brave só entende que é arrasto depois de uns pixels) e solta no destino: um lugar da tela ("top-left", "direita", "centro", "metade esquerda"), outro elemento ("Lixeira") ou um ponto. A origem pode ser descrita ("aba do YouTube"): o openTARS acha sozinho.
 - **Mira com zoom:** o `click_mouse` recebe o que se quer clicar (`target="X da aba do YouTube"`). A coordenada que a IA chuta costuma errar por 10–40 px; o openTARS dá zoom em volta dela e acha o alvo exato com a visão em grade. Sem modelo de visão, um clique que caiu do lado de um botão encaixa nele.
+- **Move janela de verdade:** "arraste a janela do openTARS pro topo esquerdo", "põe o Firefox na metade direita", "maximiza o terminal": o openTARS pede ao gerenciador de janelas (`move_window`), em vez de arrastar o que está escrito dentro dela.
 - **Confere o clique:** compara a tela antes e depois. Se nada mudou, a IA recebe "o clique ERROU" em vez de dizer que fez.
 
 Apps Electron (Claude, Discord, VS Code…) abertos **pelo openTARS** já saem com a acessibilidade ligada. Aí o clique pelo nome funciona neles direto.
@@ -177,9 +178,9 @@ Pedido com várias etapas ("abre o gmail e depois o spotify") vira um **plano** 
 
 ### 6. Voz, rotinas e memória (3.0)
 
-- **Voz, 100% local:** diga **"TARS, abre o Firefox"**. Um Whisper pequenininho fica ouvindo só o nome; o pedido é transcrito por um maior (faster-whisper, na CPU), e a resposta sai falada pelo Piper. `Ctrl+M` (ou **Voz ▾ → Falar agora**) fala sem precisar dizer "TARS". Liga no botão **Voz** da janela ou com `opentars --voz` no terminal.
+- **Voz, 100% local:** diga **"TARS, abre o Firefox"**. Um Whisper pequenininho fica ouvindo só o nome; o pedido é transcrito por um maior (faster-whisper, na CPU), e a resposta sai falada pelo Piper. `Ctrl+M` (ou **Voz ▾ → Falar agora**) fala sem precisar dizer "TARS". Liga no botão **Voz** da janela, ou com `opentars --voz` pra usar só a voz, sem janela.
   - **Responde rápido (3.0 Miller):** os modelos já ficam carregados; o nome é conferido enquanto você ainda fala (a tela mostra na hora que ouviu); no fim da frase só falta entender o pedido. "TARS" sozinho: ele responde **"Sim?"** e espera o pedido. Depois de responder falando, dá pra continuar a conversa **sem dizer "TARS"** por alguns segundos.
-- **Rotinas:** "todo dia às 8h abre o gmail e o spotify", "dias úteis às 18h fecha o discord", "daqui a 10 minutos me lembra de tirar o bolo". Na hora, o pedido entra sozinho (com notificação do sistema), enquanto o openTARS estiver aberto (janela, barra rápida ou terminal). Ficam em `~/.config/opentars/rotinas.json`.
+- **Rotinas:** "todo dia às 8h abre o gmail e o spotify", "dias úteis às 18h fecha o discord", "daqui a 10 minutos me lembra de tirar o bolo". Na hora, o pedido entra sozinho (com notificação do sistema), enquanto o openTARS estiver aberto (janela, barra rápida ou `opentars --voz`). Ficam em `~/.config/opentars/rotinas.json`.
 - **Memória:** "lembra que meu navegador é o Brave", "minha pasta de projetos é ~/dev". Vale pra toda conversa daqui pra frente; "esquece o do Brave" apaga. Fica em `~/.config/opentars/memoria.json`.
 
 ### 7. Outros servidores e Wayland (3.0)
@@ -193,7 +194,7 @@ Todos os modelos compartilham a mesma conversa: trocar de IA no meio não faz el
 
 ## Uso
 
-Abra o **openTARS** no menu de aplicativos, ou rode `opentars-gui`. Prefere o terminal? Use `opentars`.
+Abra o **openTARS** no menu de aplicativos, ou rode `opentars-gui`. Pra usar só a voz: `opentars --voz`. O `opentars` sozinho, no terminal, confere se está tudo certo com o ambiente.
 
 <img src="boas-vindas.png" width="620" alt="Tela inicial com quatro sugestões de pedido e o menu de idioma (PT-BR) no topo">
 
@@ -231,14 +232,14 @@ No KDE e em outros ambientes, cadastre à mão um atalho com o comando `opentars
 
 ### Controles
 
-| Na janela | No terminal | O que faz |
+| Na janela | Ou digite | O que faz |
 |---|---|---|
-| **Parar** ou `Esc` | `Ctrl+C` | interrompe a resposta ou a tarefa na hora |
+| **Parar** ou `Esc` | | interrompe a resposta ou a tarefa na hora |
 | `↑` / `↓` | | repete pedidos anteriores |
 | seletor **IA** no topo | `/modelo <nome>` · `/modelo auto` | fixa um modelo ou volta pro automático |
 | menu **PT-BR ▾** no topo | `/idioma <código>` | troca o idioma |
 | **Nova conversa** | `/limpar` | começa do zero (a conversa fica salva entre usos) |
-| **Voz ▾** · `Ctrl+M` | `opentars --voz` | fala o pedido; liga "Ouvir TARS" e "Responder falando" |
+| **Voz ▾** · `Ctrl+M` | | fala o pedido; liga "Ouvir TARS" e "Responder falando" |
 
 Outros comandos:
 
@@ -255,7 +256,7 @@ Outros comandos:
 
 ## Idiomas
 
-A janela, o terminal, o instalador e o menu de aplicativos falam **português, inglês, espanhol, francês e alemão**. Troque no menu do topo da janela (ou com `/idioma en` / `opentars --idioma es`); a escolha fica salva. Sem escolha, vale o idioma do sistema.
+A janela, a linha de comando, o instalador e o menu de aplicativos falam **português, inglês, espanhol, francês e alemão**. Troque no menu do topo da janela (ou com `/idioma en` / `opentars --idioma es`); a escolha fica salva. Sem escolha, vale o idioma do sistema.
 
 A IA responde no idioma escolhido, e entende pedidos em qualquer um deles: as palavras-chave consideram o idioma escolhido, o do sistema e o inglês.
 
@@ -384,7 +385,6 @@ O arquivo não está na pasta atual. Entre na pasta onde ele foi baixado (`cd ~/
 - **Ollama não instalou** (sem internet na hora): instale em [ollama.com/download](https://ollama.com/download) e rode `opentars --setup`.
 - **Interface gráfica não abre**: `sudo apt install python3-tk` e depois `opentars --setup`.
 - **Precisa de ajuda?** Rode `opentars --autoteste` e mande o arquivo `~/opentars-autoteste.txt`.
-- **Vindo de uma versão antiga?** O ajudante anterior (`gemma3:270m`) não é mais usado. Pra liberar espaço: `ollama rm gemma3:270m`.
 </details>
 
 ## Desinstalar
@@ -427,7 +427,7 @@ logo.svg, *.png         imagens deste README (janela.png, boas-vindas.png, barra
 ```
 
 ```bash
-python3 tars.py                 # terminal (precisa de requests, psutil, pyautogui, pillow, python3-tk e python3-gi)
+python3 tars.py                 # diagnóstico e opções de linha de comando (precisa de requests, psutil, pyautogui, pillow, python3-tk e python3-gi)
 python3 tars_gui.py             # interface gráfica
 python3 tests/run_all.py        # testes
 bash empacotamento/build.sh     # gera o .deb em dist/
