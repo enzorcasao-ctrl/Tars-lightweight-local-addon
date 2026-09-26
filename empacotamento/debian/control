@@ -1,0 +1,24 @@
+Package: opentars
+Version: @VERSAO@
+Section: utils
+Priority: optional
+Architecture: all
+Depends: python3 (>= 3.8), python3-venv, python3-pip, python3-tk, python3-requests, python3-psutil, python3-pil, python3-pil.imagetk, python3-xlib, python3-gi, gir1.2-atspi-2.0, at-spi2-core, curl, ca-certificates, zstd, pciutils, xclip
+Recommends: gnome-screenshot | kde-spectacle | grim, wl-clipboard, libgtk-3-bin, tesseract-ocr, tesseract-ocr-por, tesseract-ocr-spa, tesseract-ocr-fra, tesseract-ocr-deu
+Conflicts: tars
+Replaces: tars
+Provides: tars
+Installed-Size: @TAMANHO@
+Maintainer: Enzo <enzorcasao@gmail.com>
+Homepage: https://github.com/enzorcasao-ctrl/openTars-lightweight-local-addon
+Description: 100% local AI assistant for the Linux desktop
+ openTARS is an AI assistant that runs entirely on your machine (through
+ Ollama), with no cloud. It understands requests in Portuguese, English,
+ Spanish, French and German and controls the desktop: opens and closes
+ apps, clicks buttons by name, types, searches the web, looks at the screen
+ and runs terminal commands.
+ .
+ It adapts to whatever AI models you already have in Ollama, picking the
+ best one for each kind of task. Comes with a window ("opentars-gui"), a
+ quick bar opened by a global shortcut ("opentars-gui --rapido") and a
+ terminal mode ("opentars").

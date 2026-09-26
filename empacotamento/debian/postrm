@@ -1,0 +1,29 @@
+#!/bin/bash
+# Não mexe no Ollama nem nos modelos baixados (não são deste pacote),
+# nem no histórico/log de cada usuário (~/.tars_sessoes.json,
+# ~/.tars_log/) — isso é dado do usuário e continua intacto caso o
+# openTARS seja reinstalado depois.
+#
+# O ambiente Python (/usr/share/opentars/venv) foi criado pelo setup.sh,
+# e o __pycache__ pelo próprio Python ao rodar a GUI — nenhum dos dois
+# pelo dpkg, então o dpkg não sabe apagá-los sozinho. Ele é removido
+# aqui na desinstalação — mas NÃO numa atualização ("upgrade"), pra não
+# precisar baixar tudo de novo a cada versão nova.
+
+set -e
+
+case "$1" in
+    remove|purge)
+        rm -rf /usr/share/opentars/venv /usr/share/opentars/__pycache__
+        rmdir /usr/share/opentars 2>/dev/null || true
+        ;;
+esac
+
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database -q /usr/share/applications || true
+fi
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    gtk-update-icon-cache -q -t /usr/share/icons/hicolor || true
+fi
+
+exit 0
